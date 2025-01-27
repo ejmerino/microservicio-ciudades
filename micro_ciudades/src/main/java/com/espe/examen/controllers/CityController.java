@@ -1,11 +1,14 @@
 package com.espe.examen.controllers;
 
 import com.espe.examen.model.entity.City;
+import com.espe.examen.model.entity.CityTourist;
 import com.espe.examen.services.CityService;
+import com.espe.examen.services.CityTouristService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +20,9 @@ public class CityController {
 
     @Autowired
     private CityService cityService;
+
+    @Autowired
+    private CityTouristService cityTouristService;
 
     /**
      * Endpoint para listar todas las ciudades.
@@ -40,5 +46,18 @@ public class CityController {
         response.put("message", "Ciudad creada exitosamente.");
         response.put("data", savedCity);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    /**
+     * Endpoint para agregar un turista a una ciudad.
+     * Este metodo hace una llamada al microservicio de turistas para verificar si el turista existe
+     * y luego agrega la relación entre la ciudad y el turista.
+     */
+    @PostMapping("/{cityId}/tourists/{touristId}")
+    public ResponseEntity<CityTourist> addTouristToCity(
+            @PathVariable Long cityId,
+            @PathVariable Long touristId) {
+        CityTourist cityTourist = cityTouristService.addTouristToCity(cityId, touristId);
+        return ResponseEntity.ok(cityTourist);
     }
 }
